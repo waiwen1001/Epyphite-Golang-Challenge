@@ -139,7 +139,16 @@ func (s *APIServer) FetchIndegoData(w http.ResponseWriter, r *http.Request) erro
 		return ResponseJSON(w, status, APIResponse{Status: status, Message: "Fetch and store indego data failed"})
 	}
 
-	return ResponseJSON(w, status, APIResponse{Status: status, Message: "Indego data fetch and store successfully"})
+	t, err := utils.ParseTime(data.LastUpdated)
+	if err != nil {
+		fmt.Println("Error parsing time:", err)
+		status := http.StatusBadRequest
+		return ResponseJSON(w, status, APIResponse{Status: status, Message: "Invalid time format"})
+	}
+
+	dateTime := t.Format("2006-01-02 15:04:05")
+
+	return ResponseJSON(w, status, APIResponse{Status: status, Message: "Indego data fetch and store successfully", Data: dateTime})
 }
 
 func (s *APIServer) GetStations(w http.ResponseWriter, r *http.Request) error {

@@ -235,7 +235,7 @@ func (s *PostgresStore) StoreIndegoData(data *IndegoRes) error {
 func (s *PostgresStore) GetStationList(at string) (res []BikeResult, err error) {
 	atFrom := fmt.Sprintf("%v.000", at)
 	atTo := fmt.Sprintf("%v.999", at)
-	query := "SELECT st.*, b.dock_number, b.is_electric, b.is_available, b.battery FROM stations as st LEFT JOIN bikes b ON st.uid = b.station_id WHERE st.updated_at >= $1 AND st.updated_at <= $2 limit 100"
+	query := "SELECT st.*, b.dock_number, b.is_electric, b.is_available, b.battery FROM stations as st LEFT JOIN bikes b ON st.uid = b.station_id WHERE st.updated_at >= $1 AND st.updated_at <= $2"
 	rows, err := s.Db.Query(query, atFrom, atTo)
 
 	if err != nil {
