@@ -1,0 +1,612 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Indego Data API",
+    "description": "API to fetch and store Indego bike station data.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/indego-data-fetch-and-store-it-db": {
+      "post": {
+        "operationId": "fetchIndegoData",
+        "summary": "Fetch and store Indego data",
+        "description": "Fetches data from the Indego API and stores it in the database.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully fetched and stored data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Indego data fetch and store successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to fetch or store data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Fetch and store indego data failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stations": {
+      "get": {
+        "operationId": "getStations",
+        "summary": "Get all stations and weather by date time",
+        "description": "Fetches a list of all bike stations and weather by date time.",
+        "parameters": [
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "description": "Timestamp to capture data at a specific point in time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "Token",
+            "in": "header",
+            "required": true,
+            "description": "The API token used for authentication.",
+            "schema": {
+              "type": "string",
+              "example": "bike001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all stations and weather",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BikeResult"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing 'at' parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error: 'at' cannot be empty"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid or missing token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stations/{kioskId}": {
+      "get": {
+        "summary": "Get a station and weather by kiosk ID and date time",
+        "description": "Fetches detail for a specific station and weather based on the provided kiosk ID and date time.",
+        "operationId": "getStation",
+        "parameters": [
+          {
+            "name": "kioskId",
+            "in": "path",
+            "required": true,
+            "description": "The kiosk Id of the station.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "description": "Timestamp to capture station data and weather at a specific point in time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "Token",
+            "in": "header",
+            "required": true,
+            "description": "The API token used for authentication.",
+            "schema": {
+              "type": "string",
+              "example": "bike001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The station detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BikeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing 'at' parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error: 'at' cannot be empty"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid or missing API token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Station not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Station not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BikeResult": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          },
+          "weather": {
+            "$ref": "#/components/schemas/Weather"
+          }
+        }
+      },
+      "Feature": {
+        "type": "object",
+        "properties": {
+          "geometry": {
+            "$ref": "#/components/schemas/Geometry"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Properties"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "Geometry": {
+        "type": "object",
+        "properties": {
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "Properties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "totalDocks": {
+            "type": "integer"
+          },
+          "docksAvailable": {
+            "type": "integer"
+          },
+          "bikesAvailable": {
+            "type": "integer"
+          },
+          "classicBikesAvailable": {
+            "type": "integer"
+          },
+          "smartBikesAvailable": {
+            "type": "integer"
+          },
+          "electricBikesAvailable": {
+            "type": "integer"
+          },
+          "rewardBikesAvailable": {
+            "type": "integer"
+          },
+          "rewardDocksAvailable": {
+            "type": "integer"
+          },
+          "kioskStatus": {
+            "type": "string"
+          },
+          "kioskPublicStatus": {
+            "type": "string"
+          },
+          "kioskConnectionStatus": {
+            "type": "string"
+          },
+          "kioskType": {
+            "type": "integer"
+          },
+          "addressStreet": {
+            "type": "string"
+          },
+          "addressCity": {
+            "type": "string"
+          },
+          "addressState": {
+            "type": "string"
+          },
+          "addressZipCode": {
+            "type": "string"
+          },
+          "bikes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bike"
+            }
+          },
+          "closeTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isEventBased": {
+            "type": "boolean"
+          },
+          "isVirtual": {
+            "type": "boolean"
+          },
+          "kioskId": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "openTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publicText": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "trikesAvailable": {
+            "type": "integer"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        }
+      },
+      "Bike": {
+        "type": "object",
+        "properties": {
+          "dockNumber": {
+            "type": "integer"
+          },
+          "isElectric": {
+            "type": "boolean"
+          },
+          "isAvailable": {
+            "type": "boolean"
+          },
+          "battery": {
+            "type": "integer"
+          }
+        }
+      },
+      "Weather": {
+        "type": "object",
+        "properties": {
+          "coord": {
+            "$ref": "#/components/schemas/WeatherCoord"
+          },
+          "weather": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeatherInfo"
+            }
+          },
+          "base": {
+            "type": "string"
+          },
+          "main": {
+            "$ref": "#/components/schemas/WeatherMain"
+          },
+          "visibility": {
+            "type": "integer"
+          },
+          "wind": {
+            "$ref": "#/components/schemas/WeatherWind"
+          },
+          "clouds": {
+            "$ref": "#/components/schemas/WeatherCloud"
+          },
+          "dt": {
+            "type": "integer"
+          },
+          "sys": {
+            "$ref": "#/components/schemas/WeatherSys"
+          },
+          "timezone": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "cod": {
+            "type": "integer"
+          }
+        }
+      },
+      "WeatherCoord": {
+        "type": "object",
+        "properties": {
+          "lon": {
+            "type": "number"
+          },
+          "lat": {
+            "type": "number"
+          }
+        }
+      },
+      "WeatherInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "main": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "WeatherMain": {
+        "type": "object",
+        "properties": {
+          "temp": {
+            "type": "number"
+          },
+          "feelsLike": {
+            "type": "number"
+          },
+          "tempMin": {
+            "type": "number"
+          },
+          "tempMax": {
+            "type": "number"
+          },
+          "pressure": {
+            "type": "number"
+          },
+          "humidity": {
+            "type": "number"
+          },
+          "seaLevel": {
+            "type": "number"
+          },
+          "grndLevel": {
+            "type": "number"
+          }
+        }
+      },
+      "WeatherWind": {
+        "type": "object",
+        "properties": {
+          "speed": {
+            "type": "number"
+          },
+          "deg": {
+            "type": "integer"
+          },
+          "gust": {
+            "type": "number"
+          }
+        }
+      },
+      "WeatherCloud": {
+        "type": "object",
+        "properties": {
+          "all": {
+            "type": "integer"
+          }
+        }
+      },
+      "WeatherSys": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "sunrise": {
+            "type": "integer"
+          },
+          "sunset": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
